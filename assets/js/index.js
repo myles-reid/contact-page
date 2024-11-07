@@ -52,21 +52,21 @@ class Contact {
   #city;
 
   constructor(name, email, city) {
-    if (!this.validateName(name)) {
+    if (!Contact.validateNoun(name)) {
       addClass(nameInput, 'error');
       nameInput.setAttribute('title', 'Please enter a valid name');
     } else {
       this.name = name;
     }
 
-    if (!this.validateEmail(email)) {
+    if (!Contact.validateEmail(email)) {
       addClass(emailInput, 'error');
       emailInput.setAttribute('title', 'Please enter a valid email');
     } else {
       this.email = email;
     }
 
-    if (!this.validateCity(city)) {
+    if (!Contact.validateNoun(city)) {
       addClass(cityInput, 'error');
       cityInput.setAttribute('title', 'Please enter a valid City');
     } else {
@@ -74,35 +74,32 @@ class Contact {
     }
   }
 
-  validateName(name) {
+  static validateNoun(name) {
     const pattern = /^[A-Za-z\s'-]{2,50}$/;
     return pattern.test(name.trim());
   }
 
-  validateEmail(email) {
-    const pattern = /^[\w.-]+@[a-zA-Z\d.-]+\.[a-zA-Z]{2,}$/;
+  static validateEmail(email) {
+    const pattern = /^[\w.-]+@[a-zA-Z0-9\d.-]+\.[a-zA-Z]{2,}$/;
     return pattern.test(email.trim());
   }
 
-  validateCity(city) {
-    const pattern = /^[A-Za-z\s'-]{2,50}$/;
-    return pattern.test(city.trim());
-  }
+
 
   set name(name) {
-    if (this.validateName(name)) {
+    if (Contact.validateNoun(name)) {
       this.#name = name.trim();
     } 
   }
 
   set email(email) {
-    if (this.validateEmail(email)) {
+    if (Contact.validateEmail(email)) {
       this.#email = email.trim();
     } 
   }
 
   set city(city) {
-    if (this.validateCity(city)) {
+    if (Contact.validateNoun(city)) {
       this.#city = city.trim();
     }
   }
@@ -127,7 +124,9 @@ function newContact(name, email, city) {
 }
 
 function createContactBox() {
-  let contact = contacts[contacts.length - 1];
+contactWrapper.innerHTML = '';
+
+for (let contact of contacts) {
   const div = create('div');
   const name = create('p');
   const email = create('p');
@@ -156,28 +155,32 @@ function createContactBox() {
   addClass(nameSpan, 'info');
   addClass(emailSpan, 'info');
   addClass(citySpan, 'info');
-  
+
+  div.onclick = function() {
+    contacts.splice(contacts[contact], 1);
+    createContactBox();
+  };
+}
+ 
+  counter.innerText = contacts.length;
 }
 
+
 function clearInputs() {
+  if (Contact.validateEmail(emailInput.value)) removeClass(emailInput, 'error');
+  if (Contact.validateNoun(nameInput.value)) removeClass(nameInput, 'error');
+  if (Contact.validateNoun(cityInput.value)) removeClass(cityInput, 'error');
+
   let nameHasError = nameInput.classList.contains('error');
   let emailHasError = emailInput.classList.contains('error');
   let cityHasError = cityInput.classList.contains('error');
-
-  if (nameHasError || emailHasError || cityHasError) {
-    removeClass(nameInput, 'error')
-    removeClass(emailInput, 'error')
-    removeClass(cityInput, 'error')
-  } 
-  
   if (!nameHasError && !emailHasError && !cityHasError && !isFirstSubmit
-    && (nameInput.value || emailInput.value || cityInput.value)) 
-    {
-    console.log('here')
-    nameInput.value = '';
-    emailInput.value = '';
-    cityInput.value = '';
-  }
+      && (nameInput.value || emailInput.value || cityInput.value)) 
+      {
+      nameInput.value = '';
+      emailInput.value = '';
+      cityInput.value = '';
+    }
 
 }
 
@@ -185,28 +188,24 @@ listen('click', submitBtn, () => {
   let name = nameInput.value;
   let email = emailInput.value;
   let city = cityInput.value;
- console.log('Inputs', name, email, city);
   newContact(name, email, city);
-  
-  if (contacts.length >= 1) {
-    createContactBox()
-    clearInputs();
-  }
-
   if (isFirstSubmit) {
     isFirstSubmit = false; 
   } 
-
+  if (contacts.length >= 1) {
+    createContactBox()
+    clearInputs();
+    submitBtn.disabled = true;
+  }
 });
 
 function checkInputs() {
-  let name = nameInput.value.trim();
-  let email = emailInput.value.trim();
-  let city = cityInput.value.trim();
-
-
+  let name = nameInput.value;
+  let email = emailInput.value;
+  let city = cityInput.value;
   submitBtn.disabled = !(name && email && city);
 }
+
 
 listen ('input', nameInput, () => { checkInputs() });
 listen ('input', emailInput, () => { checkInputs() });

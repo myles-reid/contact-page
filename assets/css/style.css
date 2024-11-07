@@ -126,8 +126,8 @@ input[type=button]:disabled {
   bottom: 10px;
   right: 10px;
   background-color: #eb5d00;
-  height: 40px;
-  width: 175px;
+  height: 30px;
+  width: 130px;
   display: flex;
   align-items: center;
   padding-left: 10px;
