@@ -76,8 +76,11 @@ input[type=button]:hover {
 
 input[type=button]:disabled {
   opacity: 30%;
-  color: rgb(235 235 235);
-  background-color: rgb(128 128 128);
+  cursor: not-allowed; 
+}
+
+input[type=button]:disabled:hover {
+  background-color: #eb5d00;
 }
 
 .contacts {
@@ -123,9 +126,10 @@ input[type=button]:disabled {
   font-size: 14px;
   font-weight: 500;
   position: fixed;
-  bottom: 10px;
-  right: 10px;
-  background-color: #eb5d00;
+  bottom: 30px;
+  right: 30px;
+  background-color: rgb(0 19 176);
+  filter: contrast(75%);
   height: 30px;
   width: 130px;
   display: flex;
@@ -134,6 +138,7 @@ input[type=button]:disabled {
   border-radius: 6px;
   border: solid 0.5px rgb(255 255 255 / 20%);
   box-shadow: 1px 1px 1px rgb(0 0 0 / 25%);
+  visibility: hidden;
 }
 
 .counter > p {

@@ -44,7 +44,8 @@ const nameOutput = select('.name-info');
 const emailOutput = select('.email-info');
 const cityOutput = select('.city-info');
 const submitBtn = select('.submit');
-const counter = select('.contact-count');
+const counterText = select('.contact-count');
+const counterBox = select('.counter');
 
 class Contact {
   #name;
@@ -84,8 +85,6 @@ class Contact {
     return pattern.test(email.trim());
   }
 
-
-
   set name(name) {
     if (Contact.validateNoun(name)) {
       this.#name = name.trim();
@@ -109,60 +108,72 @@ class Contact {
   get city() { return this.#city; }
 }
 
-const { log } = console;
+
+
 let isFirstSubmit = true;
 const contacts = [];
 
 function newContact(name, email, city) {
+  const validateName = Contact.validateNoun(name);
+  const validateEmail = Contact.validateEmail(email);
+  const validateCity = Contact.validateNoun(city);
+
   const contact = new Contact(name, email, city);
 
-  if (contact.name !== undefined && 
-      contact.email !== undefined && 
-      contact.city !== undefined) {
-        contacts.push(contact)
-      }
+  if (validateName && validateEmail && validateCity) contacts.push(contact);
 }
 
 function createContactBox() {
-contactWrapper.innerHTML = '';
+  contactWrapper.innerHTML = '';
 
-for (let contact of contacts) {
-  const div = create('div');
-  const name = create('p');
-  const email = create('p');
-  const city = create('p');
-  const nameSpan = create('SPAN');
-  const emailSpan = create('SPAN');
-  const citySpan = create('SPAN');
-   
-  addFirstChild(contactWrapper, div);
+  contacts.forEach((contact, index) => {
+    let div = create('div');
+    let name = create('p');
+    let email = create('p');
+    let city = create('p');
+    let nameSpan = create('SPAN');
+    let emailSpan = create('SPAN');
+    let citySpan = create('SPAN');
+    
+    addFirstChild(contactWrapper, div);
 
-  name.innerText = 'Name: ';
-  email.innerText = 'Email: ';
-  city.innerText = 'City: ';
-  nameSpan.innerText = `${contact.name}`;
-  emailSpan.innerText = `${contact.email}`;
-  citySpan.innerText = `${contact.city}`;
+    name.innerText = 'Name: ';
+    email.innerText = 'Email: ';
+    city.innerText = 'City: ';
+    nameSpan.innerText = `${contact.name}`;
+    emailSpan.innerText = `${contact.email}`;
+    citySpan.innerText = `${contact.city}`;
 
-  addChild(name, nameSpan);
-  addChild(email, emailSpan);
-  addChild(city, citySpan);
-  addChild(div, name);
-  addChild(div, email);
-  addChild(div, city);
+    addChild(name, nameSpan);
+    addChild(email, emailSpan);
+    addChild(city, citySpan);
+    addChild(div, name);
+    addChild(div, email);
+    addChild(div, city);
+    
+    addClass(div, 'contact-tile');
+    addClass(nameSpan, 'info');
+    addClass(emailSpan, 'info');
+    addClass(citySpan, 'info');
+
+    div.onclick = function() {
+      contacts.splice(index, 1);
+      counterVisibility();
+      createContactBox();
+    };
+
+  });
   
-  addClass(div, 'contact-tile');
-  addClass(nameSpan, 'info');
-  addClass(emailSpan, 'info');
-  addClass(citySpan, 'info');
-
-  div.onclick = function() {
-    contacts.splice(contacts[contact], 1);
-    createContactBox();
-  };
+  counterText.innerText = `${contacts.length}`;
+  counterVisibility();
 }
- 
-  counter.innerText = contacts.length;
+
+
+function counterVisibility() {
+  if (parseInt(counterText.innerText) === 0){
+    counterBox.style.visibility = 'hidden'
+  } else { counterBox.style.visibility = "visible";
+  }
 }
 
 
@@ -174,6 +185,7 @@ function clearInputs() {
   let nameHasError = nameInput.classList.contains('error');
   let emailHasError = emailInput.classList.contains('error');
   let cityHasError = cityInput.classList.contains('error');
+
   if (!nameHasError && !emailHasError && !cityHasError && !isFirstSubmit
       && (nameInput.value || emailInput.value || cityInput.value)) 
       {
@@ -181,17 +193,17 @@ function clearInputs() {
       emailInput.value = '';
       cityInput.value = '';
     }
-
 }
 
 listen('click', submitBtn, () => {
   let name = nameInput.value;
   let email = emailInput.value;
   let city = cityInput.value;
+
   newContact(name, email, city);
-  if (isFirstSubmit) {
-    isFirstSubmit = false; 
-  } 
+
+  if (isFirstSubmit) {  isFirstSubmit = false; } 
+
   if (contacts.length >= 1) {
     createContactBox()
     clearInputs();
@@ -205,7 +217,6 @@ function checkInputs() {
   let city = cityInput.value;
   submitBtn.disabled = !(name && email && city);
 }
-
 
 listen ('input', nameInput, () => { checkInputs() });
 listen ('input', emailInput, () => { checkInputs() });
